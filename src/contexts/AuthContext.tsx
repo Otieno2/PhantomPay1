@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth as firebaseAuth, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, signInWithPopup, onAuthStateChanged } from '../config/firebase';
+import { auth as firebaseAuth } from '../config/firebase';
+import { GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, signInWithPopup, onAuthStateChanged } from 'firebase/auth';
 import { sendEmailLink, completeEmailLinkSignIn, isEmailLinkSignIn } from '../utils/emailLinkAuth';
 
 // Mock User interface to match Firebase User

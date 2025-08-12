@@ -61,7 +61,7 @@ const LoginPage: React.FC = () => {
 
   const sendVerificationEmail = async (email: string, code: string) => {
     // Simulate sending email - in production, this would call your email service
-    console.log(`Sending verification email to ${email} with code: ${code}`);
+    // Avoid logging verification codes to console for security
     
     // Store the code temporarily (in production, store in backend)
     localStorage.setItem(`verification_${email}`, JSON.stringify({

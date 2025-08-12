@@ -172,12 +172,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   // This function now handles both revenue (positive amount) and expenses (negative amount)
-  const collectRevenue = async ( // Renamed from collectRevenue to processAdminFinancialEvent for clarity
-    type: string, 
-    sourceTransactionId: string, 
-    sourceUserId: string, 
-    description: string,
-    amount: number // Amount is now the last parameter
+  const collectRevenue = async (
+    amount: number,
+    type: string,
+    sourceTransactionId: string,
+    sourceUserId: string,
+    description: string
   ) => {
     if (!isAdmin || !adminWallet) return;
 
@@ -197,11 +197,11 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       setRevenueRecords(prev => [newRecord, ...prev]);
       
-      // Save to localStorage
+      // Save to localStorage (prepend new record)
       const updatedRecords = [newRecord, ...revenueRecords];
       localStorage.setItem('admin_revenue_records', JSON.stringify(updatedRecords));
 
-      // Update admin wallet
+      // Update admin wallet balances and aggregates based on sign of amount
       const updatedWallet = {
         ...adminWallet,
         balance: adminWallet.balance + amount,
@@ -247,11 +247,11 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // Add withdrawal record
       // Use the collectRevenue function which now handles both revenue and expenses
       await collectRevenue(
+        -amount, // Pass negative amount for expense
         'admin_withdrawal', // New type for admin-initiated withdrawals
         `admin_withdrawal_${Date.now()}`,
         currentUser?.uid || 'admin',
-        `Admin withdrawal of ${amount.toLocaleString('en-KE', { style: 'currency', currency: 'KES' })}`,
-        -amount // Pass negative amount for expense
+        `Admin withdrawal of ${amount.toLocaleString('en-KE', { style: 'currency', currency: 'KES' })}`
       );
 
       // The admin wallet balance is already updated by collectRevenue,
@@ -264,19 +264,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       //   balance: adminWallet.balance - amount,
       //   lastUpdated: new Date()
       // };
-      // Save to localStorage
-      const updatedRecords = [withdrawalRecord, ...revenueRecords];
-      localStorage.setItem('admin_revenue_records', JSON.stringify(updatedRecords));
-
-      // Update admin wallet
-      const updatedWallet = {
-        ...adminWallet,
-        balance: adminWallet.balance - amount,
-        lastUpdated: new Date()
-      };
-
-      setAdminWallet(updatedWallet);
-      localStorage.setItem('admin_wallet', JSON.stringify(updatedWallet));
+      // Already handled within collectRevenue; avoid duplicating records/wallet updates here
 
       toast.success(`Successfully withdrew ${amount.toLocaleString('en-KE', { style: 'currency', currency: 'KES' })} 💰`);
 
@@ -317,11 +305,11 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // Add transfer record
       // Use the collectRevenue function which now handles both revenue and expenses
       await collectRevenue(
+        -amount, // Pass negative amount for expense
         'admin_transfer', // New type for admin-initiated transfers
         `admin_transfer_${Date.now()}`,
         currentUser?.uid || 'admin',
-        `Admin transfer of ${amount.toLocaleString('en-KE', { style: 'currency', currency: 'KES' })} to ${recipient}`,
-        -amount // Pass negative amount for expense
+        `Admin transfer of ${amount.toLocaleString('en-KE', { style: 'currency', currency: 'KES' })} to ${recipient}`
       );
 
       // The admin wallet balance is already updated by collectRevenue,
@@ -334,19 +322,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       //   balance: adminWallet.balance - amount,
       //   lastUpdated: new Date()
       // };
-      // Save to localStorage
-      const updatedRecords = [transferRecord, ...revenueRecords];
-      localStorage.setItem('admin_revenue_records', JSON.stringify(updatedRecords));
-
-      // Update admin wallet
-      const updatedWallet = {
-        ...adminWallet,
-        balance: adminWallet.balance - amount,
-        lastUpdated: new Date()
-      };
-
-      setAdminWallet(updatedWallet);
-      localStorage.setItem('admin_wallet', JSON.stringify(updatedWallet));
+      // Already handled within collectRevenue; avoid duplicating records/wallet updates here
 
       toast.success(`Successfully transferred ${amount.toLocaleString('en-KE', { style: 'currency', currency: 'KES' })} to ${recipient} 💸`);
 
